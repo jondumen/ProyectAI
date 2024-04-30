@@ -90,4 +90,13 @@ while True:
         img = game.update(img, pointIndex)
 
     cv2.imshow("Image", img)
-    cv2.waitKey(1)
+    key = cv2.waitKey(1) & 0xFF  # Obtener los bits menos significativos
+    if key == ord('q') or key == 27:  # Presionar 'q' o la tecla ESC para salir
+        break
+
+    # Verificar si la ventana ha sido cerrada
+    if cv2.getWindowProperty("Image", cv2.WND_PROP_AUTOSIZE) < 1:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
