@@ -5,7 +5,7 @@
 #           Pablo Pizarro Chalup    20550431
 
 # Descripcion: Este programa es un juego que hace uso de la camara web para detectar la posicion de la mano del jugador y asi poder mover un objeto en la pantalla.
-<<<<<<< HEAD
+
 import math
 import cvzone
 import cv2
@@ -48,5 +48,3 @@ while True:
 
     cv2.imshow("Image", img)
     cv2.waitKey(1)
-=======
->>>>>>> d092b82401bced37267390a935a75343e5d4ff55
