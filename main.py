@@ -5,7 +5,7 @@ import subprocess
 size = 400, 300
 
 def iniciar_juego1():
-    subprocess.run(["python", "main.py"])
+    subprocess.run(["python", "snake.py"])
 
 def mostrar_menu():
     root = tk.Tk()
