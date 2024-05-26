@@ -12,7 +12,6 @@ import cvzone
 import cv2
 import numpy as np
 from cvzone.HandTrackingModule import HandDetector
-from main import mostrar_menu
 
 def iniciar_juego1():
     # Lógica del juego 3
@@ -151,5 +150,4 @@ cap.release()
 cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    mostrar_menu()
     iniciar_juego1()  # Llamada a la función del juego 3
