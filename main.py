@@ -30,44 +30,51 @@ color_black = (0, 0, 0)    # Color negro
 sky_blue = (235, 206, 135)   # Color azul cielo
 
 
-# Clase del modo de juego Ping Pong
-class PingPong:
-    def __init__(self, pos, color):
-        self.pos = pos  # Posicion de la pelota
-        self.color = color  # Color de la pelota
-        self.radius = 20    # Radio de la pelota
-        self.direccion = [
-            random.randint(-5, -1),
-            random.randint(-5, 5)
-        ] 
+# Clase del modo de juego galaga
+class Galaga:
+    def __init__(self, score):
+        self.score = score  # Posicion del objeto
+        self.color = color_orange  # Color del objeto
+        self.radius = 20    # Radio del objeto
+        self.pos = [
+            1300,   # Horizontal
+            random.randint(1, 35) * self.radius # Vertical
+        ]
+        self.velocidad = random.randint(3, 7) * 5
 
-    # Dibujar la pelota
-    def draw(self, img): # Dibujar la pelota
+    # Obtener la puntuación
+    def get_score(self):
+        return self.score
+
+    # Dibujar el objeto
+    def draw(self, img):
         cv2.circle(img, self.pos, self.radius, self.color, cv2.FILLED) # el circulo
         cv2.circle(img, self.pos, self.radius, color_black, 2)
         self.mover()
 
     # Mover la pelota
     def mover(self):
-        self.pos[0] += self.direccion[0]*9
-        self.pos[1] += self.direccion[1]*9
-        
-        # Detectar colision con la ventana
-        #   Deteccion en lo horizontal
-        if (self.pos[0] < 10 or self.pos[0] > 1270):
-            self.direccion[0] = self.direccion[0] * -1
-        
-        #   deteccion en lo vertical
-        if (self.pos[1] < 10 or self.pos[1] > 710):
-            self.direccion[1] = self.direccion[1] * -1
+        self.pos[0] -= self.velocidad
 
+        if self.pos[0] < 0:
+            self.pos = self.random_pos()
+            self.velocidad = random.randint(1, 5) * 10
 
-juego = PingPong([640, 360], sky_blue)    # Initialize the game
+    # Velocidad aleatoria
+    def random_pos(self):
+        return [
+            1300,
+            random.randint(1, 35) * self.radius # Vertical
+        ]
+        
+
+# Inicializar el juego
+juego = Galaga(0)
 
 while True:
     success, img = cap.read()  # Leer la imagen de la camara
     img = cv2.flip(img, 1)  # Voltear la imagen horizontalmente
-    hands, img = detector.findHands(img, flipType=False)    # Detectar las manos en la imagen
+    hands, img = detector.findHands(img, False, False)    # Detectar las manos en la imagen
     grosor = 15 # Grosor de la linea
     
     # Dibujar la pelota
@@ -79,11 +86,19 @@ while True:
         punto1 = (centerPoint[0] - grosor, centerPoint[1] - 100)
         punto2 = (centerPoint[0] + grosor, centerPoint[1] + 100)
 
-        # dibujar un punto en el centro de la mano
-        cv2.rectangle(img, punto1, punto2, color_green, cv2.FILLED) # el rectangulo
-        cv2.rectangle(img, punto1, punto2, color_black, 2) # el borde del rectangulo
+        # colocar imagen de nave en el centro de la mano
+        nave = cv2.imread('nave.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
+        nave = cv2.resize(nave, (130, 130)) # Cambiar el tamaño de la imagen
+        nave = cv2.rotate(nave, cv2.ROTATE_90_CLOCKWISE) # Rotar la imagen
+        img = cvzone.overlayPNG(img, nave, [centerPoint[0] - 65, centerPoint[1] - 65]) # Superponer la imagen en la pantalla
         
-        
+    # Escribir el titulo del juego en la pantalla
+    cv2.putText(img, "Handlaga", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
+    # Escribir la puntuacion en pantalla 
+    cv2.putText(img, "Score: " + str(juego.get_score()), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
+    # Escribir el numero de vidas en pantalla
+    cv2.putText(img, "Lives: ", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
+    
 
     cv2.imshow("Image", img)    # Mostrar la imagen
 
@@ -92,7 +107,7 @@ while True:
     if key == ord('q') or key == 27:  # Presionar 'q' o la tecla ESC para salir
         break
     if key == ord('r'):
-        juego = PingPong([640, 360], sky_blue)    # Reiniciar el juego
+        juego = Galaga(juego.get_score())    # Reiniciar el juego
     
     # Verificar si la ventana ha sido cerrada
     if cv2.getWindowProperty("Image", cv2.WND_PROP_AUTOSIZE) < 1:
