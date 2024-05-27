@@ -32,7 +32,7 @@ class SnakeGameClass:
         self.allowedLength = 150 # Longitud maxima de la serpiente
         self.previousHead = 0, 0    # Posicion anterior de la cabeza de la serpiente
 
-        self.imgFood = cv2.imread('donut.png', cv2.IMREAD_UNCHANGED)    # Cargar imagen de la comida
+        self.imgFood = cv2.imread('img/donut.png', cv2.IMREAD_UNCHANGED)    # Cargar imagen de la comida
         self.hFood, self.wFood, _ = self.imgFood.shape  # Obtener dimensiones de la comida
         self.foodPoints = 0, 0  # Posicion de la comida
         self.randomFoodLoc()    # Posicion aleatoria de la comida
@@ -125,7 +125,7 @@ game = SnakeGameClass()
 while True:
     success, img = cap.read()  # Leer la imagen de la camara
     img = cv2.flip(img, 1)  # Voltear la imagen horizontalmente
-    hands, img = detector.findHands(img, flipType=False)    # Detectar las manos en la imagen
+    hands, img = detector.findHands(img, draw=False, flipType=False)    # Detectar las manos en la imagen y quitar el Rig de la mano (draw=False)
 
     if hands:
         lmList = hands[0]['lmList']   # Lista de puntos de la mano
