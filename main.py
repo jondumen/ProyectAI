@@ -34,6 +34,7 @@ sky_blue = (235, 206, 135)   # Color azul cielo
 class Galaga:
     def __init__(self, score):
         self.score = score  # Posicion del objeto
+        self.lifes = 3  # Numero de vidas inicial
         self.color = color_orange  # Color del objeto
         self.radius = 20    # Radio del objeto
         self.pos = [
@@ -45,11 +46,21 @@ class Galaga:
     # Obtener la puntuación
     def get_score(self):
         return self.score
+    
+    # Obtener las vidas
+    def get_lifes(self):
+        return self.lifes
 
     # Dibujar el objeto
     def draw(self, img):
+        # Escribir la puntuacion en pantalla 
+        cv2.putText(img, "Score: " + str(juego.get_score()), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
+        # Escribir el numero de vidas en pantalla
+        cv2.putText(img, "Lives: " + str(juego.get_lifes()), (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
+
         cv2.circle(img, self.pos, self.radius, self.color, cv2.FILLED) # el circulo
         cv2.circle(img, self.pos, self.radius, color_black, 2)
+
         self.mover()
 
     # Mover la pelota
@@ -59,14 +70,23 @@ class Galaga:
         if self.pos[0] < 0:
             self.pos = self.random_pos()
             self.velocidad = random.randint(1, 5) * 10
+            self.score += 1
 
-    # Velocidad aleatoria
+    # Posicion aleatoria
     def random_pos(self):
         return [
             1300,
             random.randint(1, 35) * self.radius # Vertical
         ]
-        
+
+    # Colision con la nave con la pelota
+    def colision(self, nave):
+        # if the position of the ball is touching the rectangle of the ship, then lose a life
+        if self.pos[0] - self.radius < nave.shape[1] and self.pos[1] - self.radius < nave.shape[0] and self.pos[1] + self.radius > 0:
+            self.lifes -= 1
+            self.pos = self.random_pos()
+            self.velocidad = random.randint(1, 5) * 10
+
 
 # Inicializar el juego
 juego = Galaga(0)
@@ -76,31 +96,25 @@ while True:
     img = cv2.flip(img, 1)  # Voltear la imagen horizontalmente
     hands, img = detector.findHands(img, False, False)    # Detectar las manos en la imagen
     grosor = 15 # Grosor de la linea
+    nave = cv2.imread('nave.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
     
     # Dibujar la pelota
     juego.draw(img)
 
+    # Dibujar la mano
     if hands:
         lmList = hands[0]['lmList']   # Lista de puntos de la mano
         centerPoint = hands[0]['center']   # Punto central de la mano
-        punto1 = (centerPoint[0] - grosor, centerPoint[1] - 100)
-        punto2 = (centerPoint[0] + grosor, centerPoint[1] + 100)
 
         # colocar imagen de nave en el centro de la mano
-        nave = cv2.imread('nave.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
         nave = cv2.resize(nave, (130, 130)) # Cambiar el tamaño de la imagen
         nave = cv2.rotate(nave, cv2.ROTATE_90_CLOCKWISE) # Rotar la imagen
         img = cvzone.overlayPNG(img, nave, [centerPoint[0] - 65, centerPoint[1] - 65]) # Superponer la imagen en la pantalla
-        
-    # Escribir el titulo del juego en la pantalla
-    cv2.putText(img, "Handlaga", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
-    # Escribir la puntuacion en pantalla 
-    cv2.putText(img, "Score: " + str(juego.get_score()), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
-    # Escribir el numero de vidas en pantalla
-    cv2.putText(img, "Lives: ", (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
-    
 
-    cv2.imshow("Image", img)    # Mostrar la imagen
+        # Detectar la colision con la nave
+        juego.colision(hands[0])
+
+    cv2.imshow("Handlaga", img)    # Mostrar la imagen
 
     # Cerrar juego
     key = cv2.waitKey(1) & 0xFF  # Obtener los bits menos significativos
@@ -110,7 +124,7 @@ while True:
         juego = Galaga(juego.get_score())    # Reiniciar el juego
     
     # Verificar si la ventana ha sido cerrada
-    if cv2.getWindowProperty("Image", cv2.WND_PROP_AUTOSIZE) < 1:
+    if cv2.getWindowProperty("Handlaga", cv2.WND_PROP_AUTOSIZE) < 1:
         break
 
 cap.release()
