@@ -28,6 +28,7 @@ color_orange = (0, 140, 255)   # Color naranja
 color_white = (255, 255, 255)  # Color blanco
 color_black = (0, 0, 0)    # Color negro
 sky_blue = (235, 206, 135)   # Color azul cielo
+color_light_gray = (192, 192, 192)   # Color gris claro
 
 
 # Clase del modo de juego galaga
@@ -53,15 +54,18 @@ class Galaga:
 
     # Dibujar el objeto
     def draw(self, img):
+        cv2.circle(img, self.pos, self.radius, self.color, cv2.FILLED) # el circulo
+        cv2.circle(img, self.pos, self.radius, color_black, 2)
+
+        self.mover()
+
+    # Mostrar informacion en pantalla
+    def info(self, img):
         # Escribir la puntuacion en pantalla 
         cv2.putText(img, "Score: " + str(juego.get_score()), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
         # Escribir el numero de vidas en pantalla
         cv2.putText(img, "Lives: " + str(juego.get_lifes()), (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 2, cv2.LINE_AA)
 
-        cv2.circle(img, self.pos, self.radius, self.color, cv2.FILLED) # el circulo
-        cv2.circle(img, self.pos, self.radius, color_black, 2)
-
-        self.mover()
 
     # Mover la pelota
     def mover(self):
@@ -82,7 +86,12 @@ class Galaga:
     # Colision con la nave con la pelota
     def colision(self, nave):
         # if the position of the ball is touching the rectangle of the ship, then lose a life
-        if self.pos[0] - self.radius < nave.shape[1] and self.pos[1] - self.radius < nave.shape[0] and self.pos[1] + self.radius > 0:
+        if (
+            (nave[0] + 55 > self.pos[0] - self.radius) and 
+            (nave[0] - 55 < self.pos[0] + self.radius) and 
+            (nave[1] + 55 > self.pos[1] - self.radius) and 
+            (nave[1] - 55 < self.pos[1] + self.radius)
+            ):
             self.lifes -= 1
             self.pos = self.random_pos()
             self.velocidad = random.randint(1, 5) * 10
@@ -95,11 +104,22 @@ while True:
     success, img = cap.read()  # Leer la imagen de la camara
     img = cv2.flip(img, 1)  # Voltear la imagen horizontalmente
     hands, img = detector.findHands(img, False, False)    # Detectar las manos en la imagen
-    grosor = 15 # Grosor de la linea
     nave = cv2.imread('nave.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
-    
-    # Dibujar la pelota
-    juego.draw(img)
+
+    # en caso de que el jugador pierda
+    if juego.get_lifes() <= 0:
+        cv2.putText(img, "GAME OVER", (500, 300), cv2.FONT_HERSHEY_SIMPLEX, 2, color_black, 8, cv2.LINE_AA)
+        cv2.putText(img, "GAME OVER", (500, 300), cv2.FONT_HERSHEY_SIMPLEX, 2, color_white, 2, cv2.LINE_AA)
+
+        cv2.putText(img, "Press 'r' to restart", (530, 350), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 8, cv2.LINE_AA)
+        cv2.putText(img, "Press 'r' to restart", (530, 350), cv2.FONT_HERSHEY_SIMPLEX, 1, color_white, 2, cv2.LINE_AA)
+
+        cv2.putText(img, "Press 'q' to quit", (530, 390), cv2.FONT_HERSHEY_SIMPLEX, 1, color_black, 8, cv2.LINE_AA)
+        cv2.putText(img, "Press 'q' to quit", (530, 390), cv2.FONT_HERSHEY_SIMPLEX, 1, color_white, 2, cv2.LINE_AA)
+    else:
+        # Dibujar la pelota
+        juego.draw(img)
+        juego.info(img)
 
     # Dibujar la mano
     if hands:
@@ -109,10 +129,14 @@ while True:
         # colocar imagen de nave en el centro de la mano
         nave = cv2.resize(nave, (130, 130)) # Cambiar el tamaño de la imagen
         nave = cv2.rotate(nave, cv2.ROTATE_90_CLOCKWISE) # Rotar la imagen
-        img = cvzone.overlayPNG(img, nave, [centerPoint[0] - 65, centerPoint[1] - 65]) # Superponer la imagen en la pantalla
+        img = cvzone.overlayPNG(img, nave, [centerPoint[0] - 70, centerPoint[1] - 62]) # Superponer la imagen en la pantalla
 
         # Detectar la colision con la nave
-        juego.colision(hands[0])
+        juego.colision(centerPoint)
+
+        # Dibujar coliision box de la nave
+        cv2.rectangle(img, (centerPoint[0] - 55, centerPoint[1] - 55), (centerPoint[0] + 55, centerPoint[1] + 55), color_black, 2)
+        
 
     cv2.imshow("Handlaga", img)    # Mostrar la imagen
 
