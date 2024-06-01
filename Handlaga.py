@@ -104,7 +104,7 @@ while True:
     success, img = cap.read()  # Leer la imagen de la camara
     img = cv2.flip(img, 1)  # Voltear la imagen horizontalmente
     hands, img = detector.findHands(img, False, False)    # Detectar las manos en la imagen
-    nave = cv2.imread('nave.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
+    nave = cv2.imread('img/nave.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
 
     # en caso de que el jugador pierda
     if juego.get_lifes() <= 0:

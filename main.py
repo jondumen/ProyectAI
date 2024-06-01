@@ -1,11 +1,20 @@
+# Proyecto Juego con camara web
+# Materia: Inteligencia Artificial
+# Profesor: Arturo Legarda Saens
+# Alumnos:  Jonathan Duran Mendoza  20550401
+#           Pablo Pizarro Chalup    20550431
+
+# Descripcion: Este programa es menú principal de la aplicacion la cual hace uso de varias librerias de interfaz grafica de Python (Tkinter e ImageTK) 
+# para poder mostrar imagenes, asi como delegar que se ejecuten los juegos que programamos mediante la libreria Subprocess, asi como un bajo uso de memoria RAM y CPU
+
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
 import subprocess
 import threading
-import random
-import os
-import pygame
+#import random
+#import os
+#import pygame
 
 size = 825, 500  # Tamaño inicial
 aspect_ratio = size[0] / size[1]
@@ -40,7 +49,7 @@ class SplashScreen:
 
 def iniciar_juego(command):
     # Pausar la música antes de iniciar el juego
-    pygame.mixer.music.pause()
+    #pygame.mixer.music.pause()
 
     # Mostrar la barra de progreso
     progress_bar.place(relx=0.5, rely=0.9, anchor="center", relwidth=0.8)
@@ -56,7 +65,7 @@ def iniciar_juego(command):
         progress_bar.place_forget()  # Ocultar la barra de progreso
         loading_label.place_forget()  # Ocultar el texto de carga
         # Reanudar la música después de que el juego termine
-        pygame.mixer.music.unpause()
+        #pygame.mixer.music.unpause()
 
     threading.Thread(target=run_game).start()
 
@@ -64,7 +73,7 @@ def iniciar_juego1():
     iniciar_juego(["python", "snake.py"])
 
 def iniciar_juego2():
-    iniciar_juego(["python", "pong.py"])
+    iniciar_juego(["python", "Handlaga.py"])
 
 def iniciar_juego3():
     iniciar_juego(["python", "paint.py"])
@@ -137,9 +146,9 @@ def restore_window_size(event):
     global size
     root.geometry(f"{size[0]}x{size[1]}")
 
-def salir():
-    pygame.mixer.quit()  # Detener la reproducción de música
-    root.destroy()
+#def salir():
+    #pygame.mixer.quit()  # Detener la reproducción de música
+    #root.destroy()
 
 def mostrar_menu():
     global background_image, background_label, root, button_juego1_img, button_juego2_img, button_juego3_img, progress_bar, loading_label, size
@@ -177,7 +186,7 @@ def mostrar_menu():
     button_juego1.place(relx=0.230, rely=0.52, anchor="center")
 
     # Botón para iniciar Handlaga
-    button_juego2 = tk.Button(root, image=button_juego2_img, command=abrir_ventana_under_construction, bg="lightyellow")
+    button_juego2 = tk.Button(root, image=button_juego2_img, command=iniciar_juego2, bg="lightyellow")
     button_juego2.place(relx=0.47, rely=0.5, anchor="center")
 
     # Botón para iniciar Paint
@@ -196,14 +205,14 @@ def mostrar_menu():
     root.mainloop()
 
 if __name__ == "__main__":
-    pygame.mixer.init()  # Inicializar Pygame para reproducir música
+    #pygame.mixer.init()  # Inicializar Pygame para reproducir música
     # Ruta completa al directorio de canciones
-    directorio_canciones = r"C:\Users\Jon Hatsune\Documents\TEC II - Trabajos\4.- Inteligencia Artificial\Music"  
+    #directorio_canciones = r"C:\Users\Jon Hatsune\Documents\TEC II - Trabajos\4.- Inteligencia Artificial\Music"  
     # Lista de canciones MP3
-    canciones = ["1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"]
+    #canciones = ["1.mp3", "2.mp3", "3.mp3", "4.mp3", "5.mp3", "6.mp3", "7.mp3", "8.mp3"]
     # Reproducir música aleatoria
-    pygame.mixer.music.load(os.path.join(directorio_canciones, random.choice(canciones)))
-    pygame.mixer.music.play(-1)  # Reproducir en bucle infinito
+    #pygame.mixer.music.load(os.path.join(directorio_canciones, random.choice(canciones)))
+    #pygame.mixer.music.play(-1)  # Reproducir en bucle infinito
     
     # Crear y mostrar el splash screen
     splash_root = tk.Tk()

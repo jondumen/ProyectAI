@@ -133,6 +133,12 @@ while True:
         # cv2.circle(img, pointIndex, 20, (200, 0, 200), cv2.FILLED)
         img = game.update(img, pointIndex)  # Actualizar el juego
 
+        # colocar imagen de nave en el centro de la mano
+        nave = cv2.imread('img/pointer.png', cv2.IMREAD_UNCHANGED) # Leer la imagen de la nave
+        nave = cv2.resize(nave, (130, 130)) # Cambiar el tamaño de la imagen
+        #nave = cv2.rotate(nave, cv2.ROTATE_90_CLOCKWISE) # Rotar la imagen
+        img = cvzone.overlayPNG(img, nave, [pointIndex[0] - 65, pointIndex[1] - 65]) # Superponer la imagen en la pantalla
+
     cv2.imshow("Image", img)    # Mostrar la imagen
 
     # Cerrar juego
